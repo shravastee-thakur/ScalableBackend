@@ -1,6 +1,21 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Model, Schema } from "mongoose";
 
-const todoModel = new Schema(
+export interface Todo extends mongoose.Document {
+  user: mongoose.Schema.Types.ObjectId;
+  title: string;
+  description: string;
+  status: string;
+}
+
+export const DOCUMENT_NAME = "Todo";
+export const COLLECTION_NAME = "todos";
+
+export enum Status {
+  NOT_STARTED = "non-started",
+  IN_PROGRESS = "IN_PROGRESS",
+  DONE = "DONE",
+}
+const todoModel = new Schema<Todo>(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -18,8 +33,8 @@ const todoModel = new Schema(
     status: {
       type: String,
       required: true,
-      default: "not-started",
-      enum: ["not-started", "in-progress", "done"],
+      default: Status.NOT_STARTED,
+      enum: Object.values(Status),
     },
   },
   {
@@ -27,6 +42,10 @@ const todoModel = new Schema(
   }
 );
 
-const Todo = mongoose.model("Todo", todoModel);
+const Todo: Model<Todo> = mongoose.model<Todo>(
+  DOCUMENT_NAME,
+  todoModel,
+  COLLECTION_NAME
+);
 
 export default Todo;
